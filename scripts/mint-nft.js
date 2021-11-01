@@ -1,17 +1,17 @@
-require("dotenv").config()
+require('dotenv').config()
 const API_URL = process.env.API_URL
 const PUBLIC_KEY = process.env.PUBLIC_KEY
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
-const { createAlchemyWeb3 } = require("@alch/alchemy-web3")
+const { createAlchemyWeb3 } = require('@alch/alchemy-web3')
 const web3 = createAlchemyWeb3(API_URL)
 
-const contract = require("../artifacts/contracts/MyNFT.sol/MyNFT.json")
-const contractAddress = "0xb8e66342b99a87a3d16065e2f86f0ee61b5bce32"
+const contract = require('../artifacts/contracts/MyNFT.sol/MyNFT.json')
+const contractAddress = '0xb8e66342b99a87a3d16065e2f86f0ee61b5bce32'
 const nftContract = new web3.eth.Contract(contract.abi, contractAddress)
 
 async function mintNFT(tokenURI) {
-  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, "latest") //get latest nonce
+  const nonce = await web3.eth.getTransactionCount(PUBLIC_KEY, 'latest') //get latest nonce
 
   //the transaction
   const tx = {
@@ -30,13 +30,13 @@ async function mintNFT(tokenURI) {
         function (err, hash) {
           if (!err) {
             console.log(
-              "The hash of your transaction is: ",
+              'The hash of your transaction is: ',
               hash,
               "\nCheck Alchemy's Mempool to view the status of your transaction!"
             )
           } else {
             console.log(
-              "Something went wrong when submitting your transaction:",
+              'Something went wrong when submitting your transaction:',
               err
             )
           }
@@ -44,10 +44,10 @@ async function mintNFT(tokenURI) {
       )
     })
     .catch((err) => {
-      console.log("Promise failed:", err)
+      console.log('Promise failed:', err)
     })
 }
 
 mintNFT(
-  "https://gateway.pinata.cloud/ipfs/QmbxhFYx167eURe46bszibZrKVXtTphhxXvWXFC4qHfdMb"
+  'https://gateway.pinata.cloud/ipfs/QmbxhFYx167eURe46bszibZrKVXtTphhxXvWXFC4qHfdMb'
 )
