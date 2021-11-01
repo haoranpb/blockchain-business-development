@@ -1,20 +1,13 @@
 {
-  "name": "nft-leasing",
+  "name": "nesters",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/haoranpb/blockchain-business-development.git"
   },
   "author": "group 3",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/haoranpb/blockchain-business-development/issues"
-  },
+  "license": "MIT",
   "homepage": "https://github.com/haoranpb/blockchain-business-development#readme",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
