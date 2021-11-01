@@ -4,7 +4,8 @@ pragma solidity ^0.8.0;
 contract Nesters {
     // For simplicity, we use the contract owner (the platform) as the "Government" for now
     address public contractOwner;
-    mapping(uint256 => House) public houses; // Mapping from id => House
+    uint256[] public activeHouses;
+    mapping(uint256 => House) public houses;
     mapping(address => User) users;
 
     modifier onlyGov() {
@@ -56,6 +57,21 @@ contract Nesters {
         House memory house = House(_id, _owner, _physicalAddr, false, 0, 0);
         houses[_id] = house;
         users[_owner].properties.push(_id);
+    }
+
+    /**
+    Landlords set the renting price, the house is now active
+    Actived house can be seen on website
+     */
+    function activeHouse(uint256 _id, uint256 _price) public {
+        require(
+            houses[_id].owner == msg.sender,
+            "Only the landlord can activate the house"
+        );
+
+        houses[_id].price = _price;
+        houses[_id].active = true;
+        activeHouses.push(_id);
     }
 
     /**
