@@ -10,7 +10,7 @@ contract Nesters {
     modifier onlyGov() {
         require(
             msg.sender == contractOwner,
-            "Only the Government can mint houses"
+            "Only the Government can mint (verify) houses"
         );
         _;
     }
@@ -30,7 +30,7 @@ contract Nesters {
         uint256 ID;
         address owner;
         string physicalAddr;
-        // some other fields need to be verified when minted
+        // some other fields may need to be verified when minted
         bool active; // fileds below need to be instantiated before active
         uint256 price;
         uint256 rentingPeriod; // timestamp per second
@@ -59,7 +59,7 @@ contract Nesters {
     }
 
     /**
-     * Returns the length of a string
+     * Helper Function: Returns the length of a string
      * Need to use "bytes" cuz https://ethereum.stackexchange.com/a/46254
      */
     function len(string memory _str) private pure returns (uint256) {
