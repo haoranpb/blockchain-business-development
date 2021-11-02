@@ -1,9 +1,11 @@
 async function main() {
-  const MyNFT = await ethers.getContractFactory('MyNFT')
+  /* eslint-disable-next-line */
+  const Nesters = await ethers.getContractFactory('Nesters')
 
   // Start deployment, returning a promise that resolves to a contract object
-  const myNFT = await MyNFT.deploy()
-  console.log('Contract deployed to address:', myNFT.address)
+  const result = await Nesters.deploy()
+  console.log('Contract deployed to address:', result.address)
+  console.log('Search for it on: https://ropsten.etherscan.io')
 }
 
 main()
