@@ -2,38 +2,26 @@
   "name": "nesters",
   "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "site"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "npm run serve --workspace=site",
+    "build": "npm run build --workspace=site",
     "deploy": "hardhat run scripts/deploy.js",
     "verify": "hardhat verify"
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-etherscan": "^2.1.7",
-    "@vitejs/plugin-vue": "^1.9.4",
-    "autoprefixer": "^10.4.0",
     "eslint": "^8.1.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-vue": "^8.0.3",
-    "ethers": "^5.4.7",
-    "hardhat": "^2.6.5",
-    "postcss": "^8.3.11",
-    "prettier": "2.4.1",
-    "tailwindcss": "^2.2.19",
-    "vite": "^2.6.13"
+    "prettier": "2.4.1"
   },
   "dependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-etherscan": "^2.1.7",
     "dotenv": "^10.0.0",
-    "vue": "^3.2.20",
-    "vue-router": "^4.0.12"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/haoranpb/blockchain-business-development.git"
-  },
-  "author": "group 3",
-  "license": "MIT",
-  "homepage": "https://github.com/haoranpb/blockchain-business-development#readme"
+    "ethers": "^5.4.7",
+    "hardhat": "^2.6.5"
+  }
 }

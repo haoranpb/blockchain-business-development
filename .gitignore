@@ -3,3 +3,4 @@ node_modules
 cache
 artifacts
 site/dist
+.DS_Store
