@@ -24,7 +24,8 @@
   },
   "dependencies": {
     "dotenv": "^10.0.0",
-    "vue": "^3.2.20"
+    "vue": "^3.2.20",
+    "vue-router": "^4.0.12"
   },
   "repository": {
     "type": "git",

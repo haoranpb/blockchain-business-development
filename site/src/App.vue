@@ -1,3 +1,5 @@
 <template>
-  <h1 class="text-red-500">Hello World</h1>
+  <div class="flex flex-col h-screen bg-white">
+    <router-view />
+  </div>
 </template>
