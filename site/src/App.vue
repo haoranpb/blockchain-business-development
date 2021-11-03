@@ -13,13 +13,14 @@ export default {
           .request({ method: 'eth_requestAccounts' })
           .then((accounts) => {
             this.$store.commit('setUser', accounts[0])
+            console.log('Init Account: ' + this.$store.state.user)
           })
-      } else {
-        window.ethereum.on('accountsChanged', (accounts) => {
-          this.$store.commit('setUser', accounts[0])
-          console.log('MetaMask Account: ' + this.$store.state.user)
-        })
       }
+
+      window.ethereum.on('accountsChanged', (accounts) => {
+        this.$store.commit('setUser', accounts[0])
+        console.log('MetaMask Account: ' + this.$store.state.user)
+      })
     } else {
       alert('You must install Metamask in your brower.')
     }
