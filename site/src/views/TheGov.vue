@@ -38,7 +38,18 @@ export default {
   },
   methods: {
     submit() {
-      console.log(this.owner, this.address)
+      this.$contract.methods
+        .mintHouse(this.owner, this.address, this.getRandomInt())
+        .call({ from: process.env.VUE_APP_PUBLIC_KEY })
+        .then(() => {
+          alert('Successfully Minted!')
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
+    getRandomInt() {
+      return Math.floor(Math.random() * (999999999 - 100000000) + 100000000)
     },
   },
 }

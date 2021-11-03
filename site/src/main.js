@@ -14,8 +14,7 @@ const contract = new web3.eth.Contract(
   process.env.VUE_APP_CONTRACT_ADDRESS
 )
 
-contract.methods.contractOwner.call().call((err, result) => {
-  console.log(result)
-})
+app.config.globalProperties.$web3 = web3
+app.config.globalProperties.$contract = contract
 
 app.mount('#app')
