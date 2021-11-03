@@ -11,13 +11,13 @@ contract Nesters {
     modifier onlyGov() {
         require(
             msg.sender == contractOwner,
-            "Only the Government can mint (verify) houses"
+            'Only the Government can mint (verify) houses'
         );
         _;
     }
 
-    constructor(address _contractOwner) {
-        contractOwner = _contractOwner;
+    constructor() {
+        contractOwner = msg.sender;
     }
 
     struct User {
@@ -34,12 +34,14 @@ contract Nesters {
         // some other fields may need to be verified when minted
         bool active; // fileds below need to be instantiated before active
         uint256 price;
+        uint256 colateral;
+        uint256 startDate; // set by the tenant
         uint256 rentingPeriod; // timestamp per second
     }
 
     function registerUser(address _addr, string memory _name) public {
-        require(len(_name) > 0, "Name cannot be empty");
-        require(len(users[_addr].name) == 0, "User already exists");
+        require(len(_name) > 0, 'Name cannot be empty');
+        require(len(users[_addr].name) == 0, 'User already exists');
 
         uint256[] memory _properties;
         User memory user = User(_name, _properties, 0, 0);
@@ -51,25 +53,53 @@ contract Nesters {
         string memory _physicalAddr,
         uint256 _id
     ) public onlyGov {
-        require(houses[_id].ID == 0, "House already exists");
-        require(len(users[_owner].name) > 0, "User does not exist");
+        require(houses[_id].ID == 0, 'House already exists');
+        require(len(users[_owner].name) > 0, 'User does not exist');
 
-        House memory house = House(_id, _owner, _physicalAddr, false, 0, 0);
+        House memory house = House(
+            _id,
+            _owner,
+            _physicalAddr,
+            false,
+            0,
+            0,
+            0,
+            0
+        );
         houses[_id] = house;
         users[_owner].properties.push(_id);
+    }
+
+    function getUser(address _addr) public view returns (User memory) {
+        return users[_addr];
+    }
+
+    function getActiveHouses() public view returns (House[] memory) {
+        House[] memory _result;
+
+        for (uint256 i = 0; i < activeHouses.length; i++) {
+            _result[i] = (houses[activeHouses[i]]);
+        }
+
+        return _result;
     }
 
     /**
     Landlords set the renting price, the house is now active
     Actived house can be seen on website
      */
-    function activeHouse(uint256 _id, uint256 _price) public {
+    function activeHouse(
+        uint256 _id,
+        uint256 _price,
+        uint256 _colateral
+    ) public {
         require(
             houses[_id].owner == msg.sender,
-            "Only the landlord can activate the house"
+            'Only the landlord can activate the house'
         );
 
         houses[_id].price = _price;
+        houses[_id].colateral = _colateral;
         houses[_id].active = true;
         activeHouses.push(_id);
     }
