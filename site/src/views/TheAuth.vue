@@ -8,11 +8,7 @@
           Register User for Nesters
         </h2>
         <div class="mb-4">
-          <VfInput
-            v-model="address"
-            autofocus
-            placeholder="Public Key: 0x123..."
-          />
+          <VfInput v-model="address" placeholder="Public Key: 0x123..." />
         </div>
         <div class="mb-6">
           <VfInput v-model="username" placeholder="Username" />
