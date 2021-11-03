@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 contract Nesters {
     // For simplicity, we use the contract owner (the platform) as the "Government" for now
     address public contractOwner;
-    uint256[] public activeHouses;
+    uint256[] activeHouses;
     mapping(uint256 => House) public houses;
     mapping(address => User) users;
 
@@ -74,14 +74,8 @@ contract Nesters {
         return users[_addr];
     }
 
-    function getActiveHouses() public view returns (House[] memory) {
-        House[] memory _result;
-
-        for (uint256 i = 0; i < activeHouses.length; i++) {
-            _result[i] = (houses[activeHouses[i]]);
-        }
-
-        return _result;
+    function getActiveHouses() public view returns (uint256[] memory) {
+        return activeHouses;
     }
 
     /**
