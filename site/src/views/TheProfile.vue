@@ -4,7 +4,7 @@
     <h3 class="text-gray-500 text-sm mb-2">{{ address }}</h3>
     <p>Reputation: {{ rToken }}</p>
     <p>Voting Token: {{ vToken }}</p>
-    <div class="mt-10 flex flex-row flex-wrap space-x-10">
+    <div class="mt-10 flex flex-row flex-wrap space-x-12">
       <house-card v-for="house in houses" :key="house.id" :house="house" />
     </div>
   </div>
