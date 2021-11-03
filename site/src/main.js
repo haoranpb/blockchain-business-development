@@ -1,12 +1,13 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import store from './store'
 import './assets/tailwind.css'
 
 import { createAlchemyWeb3 } from '@alch/alchemy-web3'
 import contractABI from '../../artifacts/contracts/Nesters.sol/Nesters.json'
 
-const app = createApp(App).use(router)
+const app = createApp(App).use(router).use(store)
 const web3 = createAlchemyWeb3(process.env.VUE_APP_ALCHEMY_KEY)
 
 const contract = new web3.eth.Contract(
