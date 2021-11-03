@@ -38,14 +38,24 @@ export default {
   },
   methods: {
     submit() {
-      this.$contract.methods
-        .mintHouse(this.owner, this.address, this.getRandomInt())
-        .call({ from: process.env.VUE_APP_PUBLIC_KEY })
+      window.ethereum
+        .request({
+          method: 'eth_sendTransaction',
+          params: [
+            {
+              from: this.$store.state.user,
+              to: process.env.VUE_APP_CONTRACT_ADDRESS,
+              data: this.$contract.methods
+                .mintHouse(this.owner, this.address, this.getRandomInt())
+                .encodeABI(),
+            },
+          ],
+        })
         .then(() => {
           alert('Successfully Minted!')
         })
         .catch((err) => {
-          console.error(err)
+          console.log(err)
         })
     },
     getRandomInt() {
