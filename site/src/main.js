@@ -5,7 +5,7 @@ import store from './store'
 import './assets/tailwind.css'
 
 import { createAlchemyWeb3 } from '@alch/alchemy-web3'
-import contractABI from '../../artifacts/contracts/Nesters.sol/Nesters.json'
+import contractABI from './Nesters.json'
 
 const app = createApp(App).use(router).use(store)
 const web3 = createAlchemyWeb3(process.env.VUE_APP_ALCHEMY_KEY)

@@ -37,7 +37,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$store.state.user)
     this.getHouses()
   },
   methods: {
