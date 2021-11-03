@@ -4,6 +4,7 @@ import TheLanding from '@/views/TheLanding.vue'
 import TheGov from '@/views/TheGov.vue'
 import TheAuth from '@/views/TheAuth.vue'
 import TheProfile from '@/views/TheProfile.vue'
+import TheMarket from '@/views/TheMarket.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
         path: '/profile',
         name: 'profile',
         component: TheProfile,
+      },
+      {
+        path: '/market',
+        name: 'market',
+        component: TheMarket,
       },
     ],
   },

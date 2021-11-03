@@ -3,7 +3,7 @@
     <h1 class="text-2xl font-medium pl-8 inline-block">Nesters</h1>
     <div class="flex-grow"></div>
     <div class="flex flex-row space-x-5">
-      <h2>Marketplace</h2>
+      <router-link to="/market">Marketplace</router-link>
       <h2>Voting</h2>
       <router-link to="/profile">Profile</router-link>
       <router-link to="/auth">Register</router-link>
