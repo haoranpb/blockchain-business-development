@@ -3,6 +3,7 @@ import TheHome from '@/views/TheHome.vue'
 import TheLanding from '@/components/TheLanding.vue'
 import TheGov from '@/views/TheGov.vue'
 import TheAuth from '@/views/TheAuth.vue'
+import TheProfile from '@/views/TheProfile.vue'
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
         path: '/auth',
         name: 'auth',
         component: TheAuth,
+      },
+      {
+        path: '/profile',
+        name: 'profile',
+        component: TheProfile,
       },
     ],
   },

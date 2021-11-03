@@ -5,7 +5,7 @@
     <div class="flex flex-row space-x-5">
       <h2>Marketplace</h2>
       <h2>Voting</h2>
-      <h2>Properties</h2>
+      <router-link to="/profile">Profile</router-link>
       <router-link to="/auth">Register</router-link>
     </div>
   </nav>

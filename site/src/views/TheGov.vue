@@ -43,7 +43,7 @@ export default {
           method: 'eth_sendTransaction',
           params: [
             {
-              from: this.$store.state.user,
+              from: this.$store.state.user.address,
               to: process.env.VUE_APP_CONTRACT_ADDRESS,
               data: this.$contract.methods
                 .mintHouse(this.owner, this.address, this.getRandomInt())
