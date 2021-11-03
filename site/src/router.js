@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import TheHome from '@/views/TheHome.vue'
 import TheLanding from '@/components/TheLanding.vue'
 import TheGov from '@/views/TheGov.vue'
+import TheAuth from '@/views/TheAuth.vue'
 
 const routes = [
   {
@@ -12,6 +13,11 @@ const routes = [
         path: '/',
         name: 'landing',
         component: TheLanding,
+      },
+      {
+        path: '/auth',
+        name: 'auth',
+        component: TheAuth,
       },
     ],
   },

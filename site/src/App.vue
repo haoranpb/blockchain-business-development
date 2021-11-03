@@ -17,7 +17,7 @@ export default {
       } else {
         window.ethereum.on('accountsChanged', (accounts) => {
           this.$store.commit('setUser', accounts[0])
-          console.log(this.$store.state.user)
+          console.log('MetaMask Account: ' + this.$store.state.user)
         })
       }
     } else {
