@@ -22,10 +22,10 @@ export default {
     this.houses = []
 
     this.$contract.methods
-      .getActiveHouses()
+      .getActiveHouses(new Date().getTime())
       .call()
       .then((houses) => {
-        houses.forEach((houseID) => {
+        houses.filter(Number).forEach((houseID) => {
           this.$contract.methods
             .houses(houseID)
             .call()

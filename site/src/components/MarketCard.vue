@@ -6,7 +6,7 @@
     <p class="text-gray-400 text-xs">{{ house.ID }}</p>
     <div class="flex flex-col space-y-4 mt-6">
       <VfInput v-model="startDate" type="date" />
-      <VfInput v-model="rentingPeriod" placeholder="3 Days" />
+      <VfInput v-model="rentingPeriod" placeholder="3 Days" type="number" />
       <VfButton class="float-right" @click="submit">Make Offer</VfButton>
     </div>
   </div>
@@ -43,13 +43,17 @@ export default {
               from: this.$store.state.user.address,
               to: process.env.VUE_APP_CONTRACT_ADDRESS,
               data: this.$contract.methods
-                .activeHouse(this.house.ID, this.price, this.colateral)
+                .makeOffer(
+                  this.house.ID,
+                  new Date(this.startDate).getTime(),
+                  this.rentingPeriod * 24 * 60 * 60 * 1000
+                )
                 .encodeABI(),
             },
           ],
         })
         .then(() => {
-          alert('Successfully Activated!')
+          alert('Offer Sent!')
         })
         .catch((err) => {
           console.log(err)

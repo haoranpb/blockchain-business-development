@@ -7,10 +7,17 @@
     <div v-if="!house.active" class="flex flex-col space-y-4 mt-6">
       <VfInput v-model="price" placeholder="Price per day" />
       <VfInput v-model="colateral" placeholder="Colateral" />
-      <VfButton class="float-right" @click="submit">Active</VfButton>
+      <VfButton @click="submit">Active</VfButton>
+    </div>
+    <div v-else-if="house.offer" class="flex flex-col space-y-2 mt-4">
+      <p>Price per day: {{ house.price }}</p>
+      <p>Colateral: {{ house.colateral }}</p>
+      <p>Start Date: {{ startDate }}</p>
+      <p>Renting Period: {{ rentingPeriod }}</p>
+      <VfButton @click="accept">Accept Offer</VfButton>
     </div>
     <div v-else class="flex flex-col space-y-4 mt-8">
-      <p>Activated</p>
+      <p>No offer yet</p>
       <p>Price per day: {{ house.price }}</p>
       <p>Colateral: {{ house.colateral }}</p>
     </div>
@@ -37,6 +44,16 @@ export default {
       price: null,
       colateral: null,
     }
+  },
+  computed: {
+    startDate() {
+      return new Date(parseInt(this.house.startDate)).toLocaleDateString(
+        'en-US'
+      )
+    },
+    rentingPeriod() {
+      return Math.floor(this.house.rentingPeriod / 1000 / 60 / 60 / 24)
+    },
   },
   methods: {
     submit() {

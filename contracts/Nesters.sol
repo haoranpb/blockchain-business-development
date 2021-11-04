@@ -7,6 +7,8 @@ contract Nesters {
     uint256[] activeHouses;
     mapping(uint256 => House) public houses;
     mapping(address => User) users;
+    mapping(uint256 => Transaction) public histories;
+    uint256 historySize;
 
     modifier onlyGov() {
         require(
@@ -18,6 +20,16 @@ contract Nesters {
 
     constructor() {
         contractOwner = msg.sender;
+        historySize = 0;
+    }
+
+    struct Transaction {
+        uint256 houseID;
+        address tennat;
+        uint256 price;
+        uint256 colateral;
+        uint256 startDate;
+        uint256 rentingPeriod;
     }
 
     struct User {
@@ -35,8 +47,11 @@ contract Nesters {
         bool active; // fileds below need to be instantiated before active
         uint256 price;
         uint256 colateral;
+        bool offer;
+        address tennat;
         uint256 startDate; // set by the tenant
         uint256 rentingPeriod; // timestamp per second
+        uint256[] history;
     }
 
     function registerUser(address _addr, string memory _name) public {
@@ -56,6 +71,7 @@ contract Nesters {
         require(houses[_id].ID == 0, 'House already exists');
         require(len(users[_owner].name) > 0, 'User does not exist');
 
+        uint256[] memory _history;
         House memory house = House(
             _id,
             _owner,
@@ -63,8 +79,11 @@ contract Nesters {
             false,
             0,
             0,
+            false,
+            address(0),
             0,
-            0
+            0,
+            _history
         );
         houses[_id] = house;
         users[_owner].properties.push(_id);
@@ -74,8 +93,50 @@ contract Nesters {
         return users[_addr];
     }
 
-    function getActiveHouses() public view returns (uint256[] memory) {
+    function getActiveHouses(uint256 _now) public returns (uint256[] memory) {
+        uint256[] memory newHousesList = new uint256[](15);
+        uint256 j = 0;
+        // Do the Lazy Evaluation here, since only houses that are once active can be returned
+        // Also remove those houses that are not active anymore
+        for (uint256 i = 0; i < activeHouses.length; i++) {
+            if (houses[activeHouses[i]].active) {
+                newHousesList[j] = activeHouses[i];
+                j++;
+            } else {
+                checkHouse(activeHouses[i], _now);
+            }
+        }
+        activeHouses = newHousesList;
+
         return activeHouses;
+    }
+
+    /**
+    Check if the house renting period has expired, set the values correspondingly
+     */
+    function checkHouse(uint256 _id, uint256 _now) private {
+        if (!houses[_id].offer) {
+            if (_now - houses[_id].startDate > houses[_id].rentingPeriod) {
+                Transaction memory t = Transaction(
+                    _id,
+                    houses[_id].tennat,
+                    houses[_id].price,
+                    houses[_id].colateral,
+                    houses[_id].startDate,
+                    houses[_id].rentingPeriod
+                );
+
+                houses[_id].history.push(historySize);
+                histories[historySize] = t;
+                historySize++;
+
+                houses[_id].tennat = address(0);
+                houses[_id].price = 0;
+                houses[_id].colateral = 0;
+                houses[_id].startDate = 0;
+                houses[_id].rentingPeriod = 0;
+            }
+        }
     }
 
     /**
@@ -96,6 +157,27 @@ contract Nesters {
         houses[_id].colateral = _colateral;
         houses[_id].active = true;
         activeHouses.push(_id);
+    }
+
+    function makeOffer(
+        uint256 _id,
+        uint256 _startDate,
+        uint256 _rentingPeriod
+    ) public {
+        houses[_id].tennat = msg.sender;
+        houses[_id].startDate = _startDate;
+        houses[_id].rentingPeriod = _rentingPeriod;
+        houses[_id].offer = true;
+    }
+
+    function acceptOffer(uint256 _id) public {
+        require(
+            houses[_id].owner == msg.sender,
+            'Only the landlord can accept the offer'
+        );
+
+        houses[_id].active = false;
+        houses[_id].offer = false;
     }
 
     /**
