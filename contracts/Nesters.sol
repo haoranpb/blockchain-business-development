@@ -24,12 +24,17 @@ contract Nesters {
     }
 
     struct Transaction {
+        uint256 ID;
         uint256 houseID;
-        address tennat;
+        address tenant;
         uint256 price;
         uint256 colateral;
         uint256 startDate;
         uint256 rentingPeriod;
+        bool voted;
+        int256 tenantColateral;
+        int256 landlordColateral;
+        int256 votedColateral;
     }
 
     struct User {
@@ -48,7 +53,7 @@ contract Nesters {
         uint256 price;
         uint256 colateral;
         bool offer;
-        address tennat;
+        address tenant;
         uint256 startDate; // set by the tenant
         uint256 rentingPeriod; // timestamp per second
         uint256[] history;
@@ -104,6 +109,59 @@ contract Nesters {
         return activeHouses;
     }
 
+    function getToVoted() public view returns (Transaction[] memory) {
+        Transaction[] memory toBeVoted = new Transaction[](historySize);
+        uint256 j = 0;
+
+        for (uint256 i = 0; i < historySize; i++) {
+            if (!histories[i].voted) {
+                toBeVoted[j] = histories[i];
+                j++;
+            }
+        }
+        return toBeVoted;
+    }
+
+    /**
+     * _role: 0 for tenant, 1 for landlord
+     */
+    function setColateral(
+        uint256 _tranID,
+        int256 _price,
+        int256 _role
+    ) public {
+        if (_role == 0) {
+            histories[_tranID].tenantColateral = _price;
+        } else if (_role == 1) {
+            histories[_tranID].landlordColateral = _price;
+        } else {
+            require(false, 'Only tenant and landlord can set colateral');
+        }
+
+        // the tenant and the landlord agreed on the same colateral
+        if (
+            histories[_tranID].tenantColateral >= 0 &&
+            histories[_tranID].landlordColateral >= 0 &&
+            histories[_tranID].tenantColateral ==
+            histories[_tranID].landlordColateral
+        ) {
+            histories[_tranID].voted = true;
+            users[histories[_tranID].tenant].reputationToken += 1;
+            users[houses[histories[_tranID].houseID].owner]
+                .reputationToken += 1;
+
+            if (users[histories[_tranID].tenant].votingToken == 0) {
+                users[histories[_tranID].tenant].votingToken = 1;
+            }
+
+            if (
+                users[houses[histories[_tranID].houseID].owner].votingToken == 0
+            ) {
+                users[houses[histories[_tranID].houseID].owner].votingToken = 1;
+            }
+        }
+    }
+
     /**
     Check if the house renting period has expired, set the values correspondingly
      */
@@ -113,28 +171,33 @@ contract Nesters {
                 // renting period has expired, remove the property from the tenant list
                 for (
                     uint256 i = 0;
-                    i < users[houses[_id].tennat].properties.length;
+                    i < users[houses[_id].tenant].properties.length;
                     i++
                 ) {
-                    if (users[houses[_id].tennat].properties[i] == _id) {
-                        users[houses[_id].tennat].properties[i] = 0;
+                    if (users[houses[_id].tenant].properties[i] == _id) {
+                        users[houses[_id].tenant].properties[i] = 0;
                     }
                 }
 
                 Transaction memory t = Transaction(
+                    historySize,
                     _id,
-                    houses[_id].tennat,
+                    houses[_id].tenant,
                     houses[_id].price,
                     houses[_id].colateral,
                     houses[_id].startDate,
-                    houses[_id].rentingPeriod
+                    houses[_id].rentingPeriod,
+                    false,
+                    -1,
+                    -1,
+                    -1
                 );
 
                 houses[_id].history.push(historySize);
                 histories[historySize] = t;
                 historySize++;
 
-                houses[_id].tennat = address(0);
+                houses[_id].tenant = address(0);
                 houses[_id].price = 0;
                 houses[_id].colateral = 0;
                 houses[_id].startDate = 0;
@@ -168,7 +231,7 @@ contract Nesters {
         uint256 _startDate,
         uint256 _rentingPeriod
     ) public {
-        houses[_id].tennat = msg.sender;
+        houses[_id].tenant = msg.sender;
         houses[_id].startDate = _startDate;
         houses[_id].rentingPeriod = _rentingPeriod;
         houses[_id].offer = true;
@@ -181,7 +244,7 @@ contract Nesters {
         );
 
         // put houses also into tennant's list
-        users[houses[_id].tennat].properties.push(_id);
+        users[houses[_id].tenant].properties.push(_id);
 
         houses[_id].active = false;
         houses[_id].offer = false;

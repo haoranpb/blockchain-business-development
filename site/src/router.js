@@ -5,6 +5,7 @@ import TheGov from '@/views/TheGov.vue'
 import TheAuth from '@/views/TheAuth.vue'
 import TheProfile from '@/views/TheProfile.vue'
 import TheMarket from '@/views/TheMarket.vue'
+import TheVoting from '@/views/TheVoting.vue'
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
         path: '/market',
         name: 'market',
         component: TheMarket,
+      },
+      {
+        path: '/vote',
+        name: 'vote',
+        component: TheVoting,
       },
     ],
   },

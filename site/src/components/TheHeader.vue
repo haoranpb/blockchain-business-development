@@ -4,7 +4,7 @@
     <div class="flex-grow"></div>
     <div class="flex flex-row space-x-5">
       <router-link to="/market">Marketplace</router-link>
-      <h2>Voting</h2>
+      <router-link to="/vote">Voting</router-link>
       <router-link to="/profile">Profile</router-link>
       <router-link to="/auth">Register</router-link>
     </div>

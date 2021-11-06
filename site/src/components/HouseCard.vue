@@ -13,7 +13,7 @@
       <p>
         Tenant:
         <OutboundLink class="text-xs text-primary-600" :href="tenantLink">
-          {{ house.tennat }}
+          {{ house.tenant }}
         </OutboundLink>
       </p>
       <p>Price per day: {{ house.price }}</p>
@@ -23,11 +23,11 @@
       <VfButton @click="accept">Accept Offer</VfButton>
     </div>
     <div v-else-if="OnGoing" class="flex flex-col space-y-4 mt-8">
-      <div v-if="house.owner == $store.state.user.address">
+      <div v-if="house.owner.toLowerCase() == $store.state.user.address">
         <p>
           Rented out to:
           <OutboundLink class="text-xs text-primary-600" :href="tenantLink">
-            {{ house.tennat }}
+            {{ house.tenant }}
           </OutboundLink>
         </p>
         <p>From {{ startDate }} for {{ rentingPeriod }} days</p>
@@ -83,7 +83,7 @@ export default {
       return Math.floor(this.house.rentingPeriod / 1000 / 60 / 60 / 24)
     },
     tenantLink() {
-      return `https://ropsten.etherscan.io/address/${this.house.tennat}`
+      return `https://ropsten.etherscan.io/address/${this.house.tenant}`
     },
     ownerLink() {
       return `https://ropsten.etherscan.io/address/${this.house.owner}`
