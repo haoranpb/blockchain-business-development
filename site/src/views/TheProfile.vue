@@ -39,17 +39,27 @@ export default {
   watch: {
     '$store.state.user'() {
       if (this.$store.state.user) {
-        this.properties = []
-
-        this.$store.state.user['properties'].forEach((houseID) => {
-          this.$contract.methods
-            .houses(houseID)
-            .call()
-            .then((house) => {
-              this.properties.push(house)
-            })
-        })
+        this.getHouses()
       }
+    },
+  },
+  mounted() {
+    if (this.$store.state.user) {
+      this.getHouses()
+    }
+  },
+  methods: {
+    getHouses() {
+      this.properties = []
+
+      this.$store.state.user['properties'].filter(Number).forEach((houseID) => {
+        this.$contract.methods
+          .houses(houseID)
+          .call()
+          .then((house) => {
+            this.properties.push(house)
+          })
+      })
     },
   },
 }

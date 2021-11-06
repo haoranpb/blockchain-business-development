@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 contract Nesters {
     // For simplicity, we use the contract owner (the platform) as the "Government" for now
     address public contractOwner;
-    uint256[] activeHouses;
+    uint256[] activeHouses = new uint256[](15);
     mapping(uint256 => House) public houses;
     mapping(address => User) users;
     mapping(uint256 => Transaction) public histories;
@@ -58,8 +58,7 @@ contract Nesters {
         require(len(_name) > 0, 'Name cannot be empty');
         require(len(users[_addr].name) == 0, 'User already exists');
 
-        uint256[] memory _properties;
-        User memory user = User(_name, _properties, 0, 0);
+        User memory user = User(_name, new uint256[](15), 0, 0);
         users[_addr] = user;
     }
 
@@ -94,20 +93,14 @@ contract Nesters {
     }
 
     function getActiveHouses(uint256 _now) public returns (uint256[] memory) {
-        uint256[] memory newHousesList = new uint256[](15);
-        uint256 j = 0;
         // Do the Lazy Evaluation here, since only houses that are once active can be returned
-        // Also remove those houses that are not active anymore
+        // Also remove those houses that are not active anymore, set to 0
         for (uint256 i = 0; i < activeHouses.length; i++) {
-            if (houses[activeHouses[i]].active) {
-                newHousesList[j] = activeHouses[i];
-                j++;
-            } else {
+            if (activeHouses[i] > 0 && !houses[activeHouses[i]].active) {
                 checkHouse(activeHouses[i], _now);
+                activeHouses[i] = 0;
             }
         }
-        activeHouses = newHousesList;
-
         return activeHouses;
     }
 
@@ -117,6 +110,17 @@ contract Nesters {
     function checkHouse(uint256 _id, uint256 _now) private {
         if (!houses[_id].offer) {
             if (_now - houses[_id].startDate > houses[_id].rentingPeriod) {
+                // renting period has expired, remove the property from the tenant list
+                for (
+                    uint256 i = 0;
+                    i < users[houses[_id].tennat].properties.length;
+                    i++
+                ) {
+                    if (users[houses[_id].tennat].properties[i] == _id) {
+                        users[houses[_id].tennat].properties[i] = 0;
+                    }
+                }
+
                 Transaction memory t = Transaction(
                     _id,
                     houses[_id].tennat,
@@ -175,6 +179,9 @@ contract Nesters {
             houses[_id].owner == msg.sender,
             'Only the landlord can accept the offer'
         );
+
+        // put houses also into tennant's list
+        users[houses[_id].tennat].properties.push(_id);
 
         houses[_id].active = false;
         houses[_id].offer = false;
