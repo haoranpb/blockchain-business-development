@@ -5,7 +5,7 @@
     <p>Reputation: {{ rToken }}</p>
     <p>Voting Token: {{ vToken }}</p>
     <div class="mt-10 flex flex-row flex-wrap space-x-12">
-      <house-card v-for="house in houses" :key="house.id" :house="house" />
+      <house-card v-for="house in properties" :key="house.id" :house="house" />
     </div>
   </div>
 </template>
@@ -19,38 +19,37 @@ export default {
   },
   data() {
     return {
-      houses: [],
+      properties: [],
     }
   },
   computed: {
     address() {
-      return this.$store.state.user['address']
+      return this.$store.state.user ? this.$store.state.user['address'] : ''
     },
     name() {
-      return this.$store.state.user['name']
+      return this.$store.state.user ? this.$store.state.user['name'] : ''
     },
     rToken() {
-      return this.$store.state.user['rToken']
+      return this.$store.state.user ? this.$store.state.user['rToken'] : ''
     },
     vToken() {
-      return this.$store.state.user['vToken']
+      return this.$store.state.user ? this.$store.state.user['vToken'] : ''
     },
   },
-  mounted() {
-    this.getHouses()
-  },
-  methods: {
-    getHouses() {
-      this.houses = []
+  watch: {
+    '$store.state.user'() {
+      if (this.$store.state.user) {
+        this.properties = []
 
-      this.$store.state.user['properties'].forEach((houseID) => {
-        this.$contract.methods
-          .houses(houseID)
-          .call()
-          .then((house) => {
-            this.houses.push(house)
-          })
-      })
+        this.$store.state.user['properties'].forEach((houseID) => {
+          this.$contract.methods
+            .houses(houseID)
+            .call()
+            .then((house) => {
+              this.properties.push(house)
+            })
+        })
+      }
     },
   },
 }
