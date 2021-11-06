@@ -7,6 +7,7 @@
     <div v-if="!house.active && !OnGoing" class="flex flex-col space-y-4 mt-6">
       <VfInput v-model="price" placeholder="Price per day" />
       <VfInput v-model="colateral" placeholder="Colateral" />
+      <p class="text-primary-600 text-sm">Input Pictures</p>
       <VfButton @click="submit">Active</VfButton>
     </div>
     <div v-else-if="house.offer" class="flex flex-col space-y-2 mt-4">
