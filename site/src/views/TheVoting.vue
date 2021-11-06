@@ -6,11 +6,11 @@
         <vote-card
           v-for="vote in myTransactions"
           :key="vote.ID"
-          :vote="vote"
+          :transaction="vote"
           :yours="true"
         />
       </div>
-      <h2 class="text-xl font-medium">
+      <h2 class="text-xl font-medium mt-8">
         <span class="text-primary-700 font-semibold">Vote</span>
         and Help the
         <span class="text-primary-700 font-semibold">Community</span> 💪
@@ -19,7 +19,7 @@
         <vote-card
           v-for="vote in otherTransactions"
           :key="vote.ID"
-          :vote="vote"
+          :transaction="vote"
           :yours="false"
         />
       </div>
@@ -44,8 +44,9 @@ export default {
       return this.transactions
         ? this.transactions.filter(
             (t) =>
-              t.tenant.toLowerCase() == this.$store.state.user.address ||
-              this.$store.state.user.properties.includes(t.houseID)
+              (t.tenant.toLowerCase() == this.$store.state.user.address ||
+                this.$store.state.user.properties.includes(t.houseID)) &&
+              t.voteID < 0
           )
         : []
     },
@@ -53,8 +54,9 @@ export default {
       return this.transactions
         ? this.transactions.filter(
             (t) =>
-              t.tenant != this.$store.state.user.address &&
-              !this.$store.state.user.properties.includes(t.houseID)
+              t.tenant.toLowerCase() != this.$store.state.user.address &&
+              !this.$store.state.user.properties.includes(t.houseID) &&
+              t.voteID >= 0
           )
         : []
     },

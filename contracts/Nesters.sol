@@ -8,7 +8,12 @@ contract Nesters {
     mapping(uint256 => House) public houses;
     mapping(address => User) users;
     mapping(uint256 => Transaction) public histories;
+    mapping(uint256 => Vote) public votes;
+    mapping(uint256 => int256) vCount;
+    mapping(uint256 => Ballot) public ballots;
     uint256 historySize;
+    uint256 voteSize;
+    uint256 ballotSize;
 
     modifier onlyGov() {
         require(
@@ -21,6 +26,8 @@ contract Nesters {
     constructor() {
         contractOwner = msg.sender;
         historySize = 0;
+        voteSize = 0;
+        ballotSize = 0;
     }
 
     struct Transaction {
@@ -34,7 +41,19 @@ contract Nesters {
         bool voted;
         int256 tenantColateral;
         int256 landlordColateral;
+        int256 voteID;
+    }
+
+    struct Vote {
+        uint256 ID;
+        uint256[] ballotIDs;
         int256 votedColateral;
+    }
+
+    struct Ballot {
+        address voter;
+        uint256 voteCount;
+        uint256 votedPrice;
     }
 
     struct User {
@@ -75,7 +94,6 @@ contract Nesters {
         require(houses[_id].ID == 0, 'House already exists');
         require(len(users[_owner].name) > 0, 'User does not exist');
 
-        uint256[] memory _history;
         House memory house = House(
             _id,
             _owner,
@@ -87,7 +105,7 @@ contract Nesters {
             address(0),
             0,
             0,
-            _history
+            new uint256[](15)
         );
         houses[_id] = house;
         users[_owner].properties.push(_id);
@@ -141,25 +159,101 @@ contract Nesters {
         // the tenant and the landlord agreed on the same colateral
         if (
             histories[_tranID].tenantColateral >= 0 &&
-            histories[_tranID].landlordColateral >= 0 &&
-            histories[_tranID].tenantColateral ==
-            histories[_tranID].landlordColateral
+            histories[_tranID].landlordColateral >= 0
         ) {
-            histories[_tranID].voted = true;
-            users[histories[_tranID].tenant].reputationToken += 1;
-            users[houses[histories[_tranID].houseID].owner]
-                .reputationToken += 1;
-
-            if (users[histories[_tranID].tenant].votingToken == 0) {
-                users[histories[_tranID].tenant].votingToken = 1;
-            }
-
             if (
-                users[houses[histories[_tranID].houseID].owner].votingToken == 0
+                histories[_tranID].tenantColateral ==
+                histories[_tranID].landlordColateral
             ) {
-                users[houses[histories[_tranID].houseID].owner].votingToken = 1;
+                histories[_tranID].voted = true;
+                users[histories[_tranID].tenant].reputationToken += 10;
+                users[houses[histories[_tranID].houseID].owner]
+                    .reputationToken += 10;
+
+                if (users[histories[_tranID].tenant].votingToken == 0) {
+                    users[histories[_tranID].tenant].votingToken = 1;
+                }
+
+                if (
+                    users[houses[histories[_tranID].houseID].owner]
+                        .votingToken == 0
+                ) {
+                    users[houses[histories[_tranID].houseID].owner]
+                        .votingToken = 1;
+                }
+            } else {
+                Vote memory v = Vote(voteSize, new uint256[](15), -1);
+                histories[_tranID].voteID = int256(voteSize);
+                votes[voteSize] = v;
+                voteSize++;
             }
         }
+    }
+
+    function vote(uint256 _voteID, uint256 _price) public {
+        ballots[ballotSize] = Ballot(
+            msg.sender,
+            users[msg.sender].votingToken,
+            _price
+        );
+
+        votes[_voteID].ballotIDs.push(ballotSize);
+        ballotSize++;
+    }
+
+    /**
+     * Should be lazy evaluated, already demenstrated in Marketplace
+     */
+    function countVote(uint256 _tranID) public {
+        uint256 vID = uint256(histories[_tranID].voteID);
+        int256 mostVote = -1;
+
+        // empty vCount before counting, mapping can't be local variable
+        for (uint256 i = 0; i < votes[vID].ballotIDs.length; i++) {
+            vCount[ballots[votes[vID].ballotIDs[i]].votedPrice] = 0;
+        }
+
+        for (uint256 i = 0; i < votes[vID].ballotIDs.length; i++) {
+            vCount[ballots[votes[vID].ballotIDs[i]].votedPrice] += int256(
+                ballots[votes[vID].ballotIDs[i]].voteCount
+            );
+
+            if (
+                vCount[ballots[votes[vID].ballotIDs[i]].votedPrice] > mostVote
+            ) {
+                votes[vID].votedColateral = int256(
+                    ballots[votes[vID].ballotIDs[i]].votedPrice
+                );
+                mostVote = vCount[ballots[votes[vID].ballotIDs[i]].votedPrice];
+            }
+        }
+
+        for (uint256 i = 0; i < votes[vID].ballotIDs.length; i++) {
+            if (
+                ballots[votes[vID].ballotIDs[i]].votedPrice ==
+                uint256(votes[vID].votedColateral)
+            ) {
+                users[ballots[votes[vID].ballotIDs[i]].voter].votingToken += 1;
+            }
+        }
+
+        uint256 tenantDist = abs(
+            votes[vID].votedColateral - histories[_tranID].tenantColateral
+        );
+        uint256 landlordDist = abs(
+            votes[vID].votedColateral - histories[_tranID].landlordColateral
+        );
+
+        if (tenantDist > landlordDist) {
+            users[histories[_tranID].tenant].reputationToken -= 2;
+            users[houses[histories[_tranID].houseID].owner]
+                .reputationToken += 1;
+        } else {
+            users[houses[histories[_tranID].houseID].owner]
+                .reputationToken -= 2;
+            users[histories[_tranID].tenant].reputationToken += 1;
+        }
+        histories[_tranID].voted = true;
     }
 
     /**
@@ -251,10 +345,26 @@ contract Nesters {
     }
 
     /**
+     * Manually set user's reputation/voting token for testing purpose
+     */
+    function setUser(
+        address _addr,
+        int256 _reputation,
+        uint256 _voting
+    ) public {
+        users[_addr].reputationToken = _reputation;
+        users[_addr].votingToken = _voting;
+    }
+
+    /**
      * Helper Function: Returns the length of a string
      * Need to use "bytes" cuz https://ethereum.stackexchange.com/a/46254
      */
     function len(string memory _str) private pure returns (uint256) {
         return bytes(_str).length;
+    }
+
+    function abs(int256 x) private pure returns (uint256) {
+        return x >= 0 ? uint256(x) : uint256(-x);
     }
 }
