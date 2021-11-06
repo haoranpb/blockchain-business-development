@@ -1,6 +1,12 @@
 <template>
   <nav class="flex container h-16 mx-auto items-center">
-    <h1 class="text-2xl font-medium pl-8 inline-block">Nesters</h1>
+    <router-link
+      v-if="$route.name != 'landing'"
+      class="text-2xl font-medium pl-8 inline-block"
+      to="/"
+    >
+      Nesters
+    </router-link>
     <div class="flex-grow"></div>
     <div class="flex flex-row space-x-5">
       <router-link to="/market">Marketplace</router-link>
