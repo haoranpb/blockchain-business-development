@@ -19,7 +19,26 @@
         {{ transaction.tenantColateral }},
         {{ transaction.landlordColateral }}
       </p>
-      <p>Before: Link, After: Link</p>
+      <p>
+        <OutboundLink
+          class="text-xs text-primary-600"
+          href="https://ibb.co/hfQ0b30"
+        >
+          Landlord Picture </OutboundLink
+        >,
+        <OutboundLink
+          class="text-xs text-primary-600"
+          href="https://ibb.co/hfQ0b30"
+        >
+          Tenant MoveIn </OutboundLink
+        >,
+        <OutboundLink
+          class="text-xs text-primary-600"
+          href="https://ibb.co/hBWyc8P"
+        >
+          Tenant MoveOut
+        </OutboundLink>
+      </p>
       <div v-if="yours" class="flex flex-col space-y-4">
         <VfInput
           v-model="fine"
@@ -43,11 +62,13 @@
 <script>
 import VfInput from '@/components/VfInput.vue'
 import VfButton from '@/components/VfButton.vue'
+import OutboundLink from '@/components/OutboundLink.vue'
 
 export default {
   components: {
     VfInput,
     VfButton,
+    OutboundLink,
   },
   props: {
     transaction: {
